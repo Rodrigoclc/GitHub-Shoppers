@@ -2,6 +2,7 @@ import { IProductRepository } from "../interfaces/repository/IProductRepository"
 import database from '../database/connection';
 import { CreateProductDto } from "../dto/CreateProductDto";
 import { Product } from "../entities/Product";
+import { PoolClient } from "pg";
 
 export class ProductRepository implements IProductRepository {
     async create(itemData: CreateProductDto): Promise<Product> {
@@ -44,7 +45,7 @@ export class ProductRepository implements IProductRepository {
     return result.rows[0] || null;
   }
 
-  async findByIdForUpdate(id: number): Promise<Product | null> {
+  async findByIdForUpdate(id: number, client: PoolClient): Promise<Product | null> {
     const query = `
       SELECT id, nome, preco, qtd_atual, created_at, updated_at
       FROM itens
@@ -52,7 +53,7 @@ export class ProductRepository implements IProductRepository {
       FOR UPDATE
     `;
     
-    const result = await database.query(query, [id]);
+    const result = await client.query(query, [id]);
     
     return result.rows[0] || null;
   }
@@ -70,7 +71,7 @@ export class ProductRepository implements IProductRepository {
     return result.rows[0] || null;
   }
 
-  async decrementQuantity(id: number): Promise<Product | null> {
+  async decrementQuantity(id: number, client: PoolClient): Promise<Product | null> {
     const query = `
       UPDATE itens
       SET qtd_atual = qtd_atual - 1
@@ -78,7 +79,7 @@ export class ProductRepository implements IProductRepository {
       RETURNING id, nome, preco, qtd_atual, created_at, updated_at
     `;
     
-    const result = await database.query(query, [id]);
+    const result = await client.query(query, [id]);
     
     return result.rows[0] || null;
   }
