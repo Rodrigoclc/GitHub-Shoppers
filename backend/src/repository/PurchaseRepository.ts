@@ -6,14 +6,14 @@ import database from "../database/connection";
 import { PurchaseWithItemDto } from "../dto/PurchaseWithItemDto";
 
 export class PurchaseRepository implements IPurchaseRepository {
-  async create(compraData: CreatePurchaseDto & { comprador_github_login: string } ): Promise<Purchase> {
+  async create(compraData: CreatePurchaseDto & { comprador_github_login: string }, client: PoolClient): Promise<Purchase> {
     const query = `
       INSERT INTO compras (item_id, comprador_github_login)
       VALUES ($1, $2)
       RETURNING id, item_id, comprador_github_login, created_at, updated_at
     `;
 
-    const result = await database.query(query, [
+    const result = await (client || database).query(query, [
       compraData.item_id,
       compraData.comprador_github_login,
     ]);
