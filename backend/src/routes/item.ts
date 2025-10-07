@@ -2,10 +2,11 @@ import { Router } from 'express';
 import { validateBody } from '../middleware/validation';
 import { itemValidation } from '../utils/validation';
 import { productController} from '../di/container'
+import { authMiddleware } from '../middleware/auth';
 
 const router = Router();
 
-router.post('/', validateBody(itemValidation.create), productController.create);
-router.get('/', productController.getAll);
+router.post('/', authMiddleware, validateBody(itemValidation.create), productController.create);
+router.get('/', authMiddleware, productController.getAll);
 
 export default router;
