@@ -1,4 +1,7 @@
 import { Router } from 'express';
+import authRoutes from './auth';
+import itensRoutes from './item';
+import comprasRoutes from './purchase';
 
 const router = Router();
 
@@ -11,5 +14,10 @@ router.get('/health', (req, res) => {
     version: '1.0.0'
   });
 });
+
+// Rotas da aplicação
+router.use('/auth', authRoutes);
+router.use('/itens', itensRoutes);
+router.use('/compras', comprasRoutes);
 
 export default router;
