@@ -3,7 +3,7 @@ import database from '../database/connection';
 import { CreateProductDto } from "../dto/CreateProductDto";
 import { Product } from "../entities/Product";
 
-export class ProdutctRepository implements IProductRepository {
+export class ProductRepository implements IProductRepository {
     async create(itemData: CreateProductDto): Promise<Product> {
     const query = `
       INSERT INTO itens (nome, preco, qtd_atual)
