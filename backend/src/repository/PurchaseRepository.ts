@@ -21,22 +21,22 @@ export class PurchaseRepository implements IPurchaseRepository {
     return result.rows[0];
   }
   async findAllWithItems(): Promise<PurchaseWithItemDto[]> {
-    const query = `
-      SELECT 
-        c.id,
-        c.item_id,
-        c.comprador_github_login,
-        c.created_at,
-        c.updated_at,
-        i.nome as item_nome,
-        i.preco as item_preco
-      FROM compras c
-      INNER JOIN itens i ON c.item_id = i.id
-      ORDER BY c.created_at DESC
-    `;
+  const query = `
+    SELECT 
+      c.id,
+      c.item_id,
+      c.comprador_github_login,
+      c.created_at,
+      c.updated_at,
+      i.nome as item_nome,
+      i.preco as item_preco
+    FROM compras c
+    INNER JOIN itens i ON c.item_id = i.id
+    ORDER BY c.created_at DESC
+  `;
 
-    const result = await database.query(query);
-
-    return result.rows;
-  }
+  const result = await database.query(query);
+  
+  return result.rows as PurchaseWithItemDto[];
+}
 }

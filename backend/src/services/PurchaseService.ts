@@ -59,7 +59,7 @@ export class PurchaseService {
     });
   }
 
-  async getAllCompras(): Promise<CreatePurchaseDto[]> {
+  async getAllCompras(): Promise<PurchaseWithItemDto[]> {
     return await this.purchaseRepository.findAllWithItems();
   }
 }
