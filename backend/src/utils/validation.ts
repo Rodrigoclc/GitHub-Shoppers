@@ -15,6 +15,12 @@ export const userValidation = {
       .messages({
         'string.min': 'Senha deve ter pelo menos 6 caracteres',
         'any.required': 'Senha é obrigatória'
+      }),
+    role: Joi.string()
+      .valid('admin', 'user')
+      .optional()
+      .messages({
+        'any.only': 'Role deve ser "admin" ou "user"'
       })
   }),
 
