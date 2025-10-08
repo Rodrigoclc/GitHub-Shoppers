@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
-import { IProductService } from '../interfaces/services/IProductService';
-import { CreateProductDto } from '../dto/CreateProductDto';
+import { Request, Response } from "express";
+import { IProductService } from "../interfaces/services/IProductService";
+import { CreateProductDto } from "../dto/CreateProductDto";
+import { IApiResponse } from "../interfaces/IApiResponse";
 
 export class ProductController {
   private _productService: IProductService;
@@ -10,59 +11,56 @@ export class ProductController {
   }
 
   create = async (req: Request, res: Response): Promise<void> => {
+    let response: IApiResponse = { message: "" };
     try {
       const itemData: CreateProductDto = req.body;
-      
+
       const item = await this._productService.createItem(itemData);
-      
-      res.status(201).json({
-        message: 'Item criado com sucesso',
-        data: { item }
-      });
+
+      response.message = "Item criado com sucesso";
+      response.data = { item };
+      res.status(201).json(response);
     } catch (error) {
-      console.error('Erro ao criar item:', error);
-      
+      console.error("Erro ao criar item:", error);
+
       if (error instanceof Error) {
-        if (error.message === 'Já existe um item com este nome') {
-          res.status(409).json({
-            error: 'Conflito',
-            message: error.message
-          });
+        if (error.message === "Já existe um item com este nome") {
+          response.error = "Conflito";
+          response.message = error.message;
+          res.status(409).json(response);
           return;
         }
-        
-        if (error.message.includes('deve ser maior que zero') || 
-            error.message.includes('não pode ser negativa')) {
-          res.status(400).json({
-            error: 'Dados inválidos',
-            message: error.message
-          });
+
+        if (
+          error.message.includes("deve ser maior que zero") ||
+          error.message.includes("não pode ser negativa")
+        ) {
+          response.error = "Dados inválidos";
+          response.message = error.message;
+          res.status(400).json(response);
           return;
         }
       }
-      
-      res.status(500).json({
-        error: 'Erro interno do servidor',
-        message: 'Falha ao criar item'
-      });
+      response.error = "Erro interno do servidor";
+      response.message = "Falha ao criar item";
+      res.status(500).json(response);
     }
   };
 
   getAll = async (req: Request, res: Response): Promise<void> => {
+    let response: IApiResponse = { message: "" };
     try {
       const items = await this._productService.getAllItems();
-      
-      res.status(200).json({
-        message: 'Itens obtidos com sucesso',
-        data: { items }
-      });
+
+      response.message = "Itens obtidos com sucesso";
+      response.data = { items };
+      res.status(200).json(response);
     } catch (error) {
-      console.error('Erro ao obter itens:', error);
-      
-      res.status(500).json({
-        error: 'Erro interno do servidor',
-        message: 'Falha ao obter lista de itens'
-      });
+      console.error("Erro ao obter itens:", error);
+
+      response.error = "Erro interno do servidor";
+      response.message = "Falha ao obter lista de itens";
+      res.status(500).json(response);
     }
   };
 }

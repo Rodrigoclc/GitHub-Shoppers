@@ -1,7 +1,8 @@
-import { Request, Response } from 'express';
-import { IAuthService } from '../interfaces/services/IAuthService';
-import { CreateUserDto } from '../dto/CreateUserDto';
-import { LoginDto } from '../dto/LoginDto';
+import { Request, response, Response } from "express";
+import { IAuthService } from "../interfaces/services/IAuthService";
+import { CreateUserDto } from "../dto/CreateUserDto";
+import { LoginDto } from "../dto/LoginDto";
+import { IApiResponse } from "../interfaces/IApiResponse";
 
 export class AuthController {
   private authService: IAuthService;
@@ -11,151 +12,139 @@ export class AuthController {
   }
 
   register = async (req: Request, res: Response): Promise<void> => {
+    let response: IApiResponse = { message: "" };
     try {
       const userData: CreateUserDto = req.body;
-      
+
       const result = await this.authService.register(userData);
-      
-      res.status(201).json({
-        message: 'Usuário criado com sucesso',
-        data: {
-          user: result.user,
-          token: result.token
-        }
-      });
+
+      response.data = {
+        user: result.user,
+        token: result.token,
+      };
+      response.message = "Usuário criado com sucesso";
+      res.status(201).json(response);
     } catch (error) {
-      console.error('Erro no registro:', error);
-      
-      if (error instanceof Error) {
-        if (error.message === 'Email já está em uso') {
-          res.status(409).json({
-            error: 'Conflito',
-            message: error.message
-          });
-          return;
-        }
+      console.error("Erro no registro:", error);
+
+      if (error instanceof Error && error.message === "Email já está em uso") {
+        response.error = "Conflito";
+        response.message = error.message;
+        res.status(409).json(response);
+        return;
       }
-      
-      res.status(500).json({
-        error: 'Erro interno do servidor',
-        message: 'Falha ao criar usuário'
-      });
+      response.error = "Erro interno do servidor";
+      response.message = "Falha ao criar usuário";
+      res.status(500).json(response);
     }
   };
 
   login = async (req: Request, res: Response): Promise<void> => {
+    let response: IApiResponse = { message: "" };
     try {
       const loginData: LoginDto = req.body;
-      
+
       const result = await this.authService.login(loginData);
-      
-      res.status(200).json({
-        message: 'Login realizado com sucesso',
-        data: {
-          user: result.user,
-          token: result.token
-        }
-      });
+
+      response.message = "Login realizado com sucesso";
+      response.data = {
+        user: result.user,
+        token: result.token,
+      };
+      res.status(200).json(response);
     } catch (error) {
-      console.error('Erro no login:', error);
-      
-      if (error instanceof Error && error.message === 'Credenciais inválidas') {
-        res.status(401).json({
-          error: 'Não autorizado',
-          message: 'Email ou senha incorretos'
-        });
+      console.error("Erro no login:", error);
+
+      if (error instanceof Error && error.message === "Credenciais inválidas") {
+        response.error = "Não autorizado";
+        response.message = "Email ou senha incorretos";
+        res.status(401).json(response);
         return;
       }
-      
-      res.status(500).json({
-        error: 'Erro interno do servidor',
-        message: 'Falha ao realizar login'
-      });
+      response.error = "Erro interno do servidor";
+      response.message = "Falha ao realizar login";
+      res.status(500).json(response);
     }
   };
 
   getProfile = async (req: Request, res: Response): Promise<void> => {
+    let response: IApiResponse = { message: "" };
     try {
       if (!req.user) {
-        res.status(401).json({
-          error: 'Não autorizado',
-          message: 'Token de autenticação inválido'
-        });
+        response.error = "Não autorizado";
+        response.message = "Token de autenticação inválido";
+        res.status(401).json(response);
         return;
       }
 
       const user = await this.authService.getUserById(req.user.userId);
-      
+
       if (!user) {
-        res.status(404).json({
-          error: 'Usuário não encontrado',
-          message: 'O usuário associado ao token não foi encontrado'
-        });
+        response.error = "Usuário não encontrado";
+        response.message = "O usuário associado ao token não foi encontrado";
+        res.status(404).json(response);
         return;
       }
 
-      res.status(200).json({
-        message: 'Perfil obtido com sucesso',
-        data: { user }
-      });
+      response.message = "Perfil obtido com sucesso";
+      response.data = { user };
+      res.status(200).json(response);
     } catch (error) {
-      console.error('Erro ao obter perfil:', error);
-      
-      res.status(500).json({
-        error: 'Erro interno do servidor',
-        message: 'Falha ao obter perfil do usuário'
-      });
+      console.error("Erro ao obter perfil:", error);
+
+      response.error = "Erro interno do servidor";
+      response.message = "Falha ao obter perfil do usuário";
+      res.status(500).json(response);
     }
   };
 
   changePassword = async (req: Request, res: Response): Promise<void> => {
+    let response: IApiResponse = { message: "" };
     try {
       if (!req.user) {
-        res.status(401).json({
-          error: 'Não autorizado',
-          message: 'Token de autenticação inválido'
-        });
+        response.error = "Não autorizado";
+        response.message = "Token de autenticação inválido";
+        res.status(401).json(response);
         return;
       }
 
       const { currentPassword, newPassword } = req.body;
 
       if (!currentPassword || !newPassword) {
-        res.status(400).json({
-          error: 'Dados inválidos',
-          message: 'Senha atual e nova senha são obrigatórias'
-        });
+        response.error = "Dados inválidos";
+        response.message = "Senha atual e nova senha são obrigatórias";
+        res.status(400).json(response);
         return;
       }
 
       if (newPassword.length < 6) {
-        res.status(400).json({
-          error: 'Dados inválidos',
-          message: 'Nova senha deve ter pelo menos 6 caracteres'
-        });
+        response.error = "Dados inválidos";
+        response.message = "Nova senha deve ter pelo menos 6 caracteres";
+        res.status(400).json(response);
         return;
       }
 
-      await this.authService.changePassword(req.user.userId, currentPassword, newPassword);
+      await this.authService.changePassword(
+        req.user.userId,
+        currentPassword,
+        newPassword
+      );
+      response.message = "Senha alterada com sucesso";
 
-      res.status(200).json({
-        message: 'Senha alterada com sucesso'
-      });
+      res.status(200).json(response);
     } catch (error) {
-      console.error('Erro ao alterar senha:', error);
-      
-      if (error instanceof Error && error.message === 'Senha atual incorreta') {
-        res.status(400).json({
-          error: 'Dados inválidos',
-          message: error.message
-        });
+      console.error("Erro ao alterar senha:", error);
+
+      if (error instanceof Error && error.message === "Senha atual incorreta") {
+        response.error = "Dados inválidos";
+        response.message = error.message;
+        res.status(400).json(response);
         return;
       }
-      
-      res.status(500).json({
-        error: 'Erro interno do servidor',
-        message: 'Falha ao alterar senha'
-      });
+      response.error = "Erro interno do servidor";
+      response.message = "Falha ao alterar senha";
+
+      res.status(500).json(response);
     }
   };
 }
