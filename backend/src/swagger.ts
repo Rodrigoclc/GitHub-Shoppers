@@ -1,22 +1,28 @@
 import swaggerJsdoc from "swagger-jsdoc";
-
+import { config } from "dotenv";
+config();
 const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "API de Exemplo com Swagger",
+      title: "API GitHub Shoppers",
       version: "1.0.0",
       description:
-        "Documentação da minha API REST usando Express e TypeScript.",
+        "API para gerenciamento de produtos e compras, integrada com GitHub.",
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "http://localhost:" + (process.env.PORT || 3000),
         description: "Servidor de desenvolvimento",
-      },
+      }
+    ],
+    tags: [
+      { name: "Itens", description: "Operações relacionadas a itens" },
+      { name: "Compras", description: "Operações relacionadas a compras" },
+      { name: "Autenticação", description: "Operações de autenticação e usuários" },
     ],
   },
-  apis: ["./src/routes/*.ts", "./src/controllers/*.ts"], // Caminhos para os arquivos que contêm anotações JSDoc
+  apis: ["./src/docs/schemas/*.ts"], // Caminhos para os arquivos que contêm anotações JSDoc
 };
 
 const specs = swaggerJsdoc(options);
