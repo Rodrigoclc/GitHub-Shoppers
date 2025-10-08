@@ -45,8 +45,8 @@ A aplicação é composta por **frontend (React)** e **backend (Node.js + TypeSc
 
 ### 1. Clonar o repositório
 ```bash
-git clone <URL_DO_REPOSITORIO>
-cd <NOME_DO_REPOSITORIO>
+git clone https://github.com/Rodrigoclc/GitHub-Shoppers
+cd GitHub-Shoppers
 ```
 
 ---
@@ -58,15 +58,9 @@ cd backend
 npm install
 ```
 
-Crie o arquivo `.env`:
-```
-PORT=3000
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASS=sua_senha
-DB_NAME=github_shoppers
-JWT_SECRET=umsegredoseguro
+Copie o arquivo `.env.example`:
+```bash
+cp .env.example .env
 ```
 
 Suba o banco PostgreSQL e rode os scripts/migrations necessários.
