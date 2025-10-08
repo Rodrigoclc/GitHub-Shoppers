@@ -12,6 +12,7 @@ const startServer = async (): Promise<void> => {
     // Iniciar servidor
     const server = app.listen(config.port, () => {
       console.log(`🚀 Servidor rodando na porta ${config.port}`);
+      console.log(`Documentação da API em http://localhost:${config.port}/api-docs`);
     });
 
     // Graceful shutdown

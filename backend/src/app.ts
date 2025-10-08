@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import config from './config/environment';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import swaggerUi from 'swagger-ui-express';
+import specs from './swagger';
 
 const app = express();
 
@@ -43,6 +45,8 @@ app.use((req, res, next) => {
   res.setHeader('X-Powered-By', 'GitHub-Shoppers-API');
   next();
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use('/api', routes);
 
