@@ -53,8 +53,8 @@ export class PurchaseService {
 
       return {
         ...purchase,
-        item_nome: item.nome,
-        item_preco: item.preco
+        itemName: item.nome,
+        itemPrice: item.preco
       };
     });
   }

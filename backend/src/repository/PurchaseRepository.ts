@@ -28,8 +28,8 @@ export class PurchaseRepository implements IPurchaseRepository {
       c.comprador_github_login,
       c.created_at,
       c.updated_at,
-      i.nome as item_nome,
-      i.preco as item_preco
+      i.nome as itemName,
+      i.preco as itemPrice
     FROM compras c
     INNER JOIN itens i ON c.item_id = i.id
     ORDER BY c.created_at DESC
