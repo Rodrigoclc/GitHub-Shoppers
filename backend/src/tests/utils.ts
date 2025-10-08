@@ -1,6 +1,7 @@
 import database from '../database/connection';
 import request from 'supertest';
 import app from '../app';
+import { CreateProductDto } from '../dto/CreateProductDto';
 
 export class TestUtils {
   static async clearDatabase(): Promise<void> {
@@ -35,19 +36,11 @@ export class TestUtils {
     }
   }
 
-  static expectConflictError(response: any): void {
-    expect(response.status).toBe(409);
-    expect(response.body).toHaveProperty('error');
-  }
-
   static async createTestUser(
     email: string = 'test@example.com', 
     password: string = 'password123',
     role?: 'admin' | 'user'
-  ): Promise<{
-    user: any;
-    token: string;
-  }> {
+  ): Promise<string> {
     const userData: any = { email, password };
     if (role) {
       userData.role = role;
@@ -57,7 +50,7 @@ export class TestUtils {
       .post('/api/auth/register')
       .send(userData);
 
-    return response.body.data;
+    return response.body.data.token;
   }
 
   static expectAuthError(response: any): void {
@@ -66,16 +59,27 @@ export class TestUtils {
     expect(response.body.error).toMatch(/não autorizado|token|autenticação/i);
   }
 
-  static async createTestItem(token: string, itemData: any = {
-    nome: 'Produto Teste',
-    preco: 100.50,
-    qtd_atual: 10
-  }): Promise<any> {
+  static async createTestItem(token: string, itemData: CreateProductDto): Promise<any> {
     const response = await request(app)
       .post('/api/itens')
       .set('Authorization', `Bearer ${token}`)
       .send(itemData);
 
     return response.body.data.item;
+  }
+
+  static expectNotFoundError(response: any): void {
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toMatch(/não encontrado/i);
+  }
+
+  static async createTestCompra(token: string, itemId: number): Promise<any> {
+    const response = await request(app)
+      .post('/api/compras')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ item_id: itemId });
+
+    return response.body.data.compras;
   }
 }
