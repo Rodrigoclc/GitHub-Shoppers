@@ -59,4 +59,23 @@ export class TestUtils {
 
     return response.body.data;
   }
+
+  static expectAuthError(response: any): void {
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toMatch(/não autorizado|token|autenticação/i);
+  }
+
+  static async createTestItem(token: string, itemData: any = {
+    nome: 'Produto Teste',
+    preco: 100.50,
+    qtd_atual: 10
+  }): Promise<any> {
+    const response = await request(app)
+      .post('/api/itens')
+      .set('Authorization', `Bearer ${token}`)
+      .send(itemData);
+
+    return response.body.data.item;
+  }
 }
