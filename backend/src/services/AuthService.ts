@@ -29,7 +29,8 @@ export class AuthService {
 
     const authPayload: AuthPayloadDto = {
       userId: user.id,
-      email: user.email
+      email: user.email,
+      role: user.role
     };
     
     const token = JwtUtils.generateToken(authPayload);
@@ -55,7 +56,8 @@ export class AuthService {
 
     const authPayload: AuthPayloadDto = {
       userId: user.id,
-      email: user.email
+      email: user.email,
+      role: user.role
     };
     
     const token = JwtUtils.generateToken(authPayload);

@@ -6,14 +6,15 @@ import { CreateUserDto } from '../dto/CreateUserDto';
 export class UserRepository implements IUserRepository {
   async create(userData: CreateUserDto & { password_hash: string }): Promise<User> {
     const query = `
-      INSERT INTO usuarios (email, password_hash)
-      VALUES ($1, $2)
-      RETURNING id, email, password_hash, created_at, updated_at
+      INSERT INTO usuarios (email, password_hash, role)
+      VALUES ($1, $2, $3)
+      RETURNING id, email, password_hash, role, created_at, updated_at
     `;
     
     const result = await database.query(query, [
       userData.email,
-      userData.password_hash
+      userData.password_hash,
+      userData.role || 'user'
     ]);
     
     return result.rows[0];
@@ -21,7 +22,7 @@ export class UserRepository implements IUserRepository {
 
   async findByEmail(email: string): Promise<User | null> {
     const query = `
-      SELECT id, email, password_hash, created_at, updated_at
+      SELECT id, email, password_hash, role, created_at, updated_at
       FROM usuarios
       WHERE email = $1
     `;
@@ -33,7 +34,7 @@ export class UserRepository implements IUserRepository {
 
   async findById(id: number): Promise<User | null> {
     const query = `
-      SELECT id, email, password_hash, created_at, updated_at
+      SELECT id, email, password_hash, role, created_at, updated_at
       FROM usuarios
       WHERE id = $1
     `;
@@ -67,7 +68,7 @@ export class UserRepository implements IUserRepository {
       UPDATE usuarios
       SET ${setClause}
       WHERE id = $1
-      RETURNING id, email, password_hash, created_at, updated_at
+      RETURNING id, email, password_hash, role, created_at, updated_at
     `;
     
     const result = await database.query(query, [id, ...values]);
