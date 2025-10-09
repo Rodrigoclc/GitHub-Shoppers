@@ -19,6 +19,7 @@ WORKDIR /app
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 RUN npm install --omit=dev
+RUN npm run migrate
 
 EXPOSE 3000
 
