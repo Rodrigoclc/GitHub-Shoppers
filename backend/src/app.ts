@@ -24,7 +24,7 @@ app.use(helmet({
 app.use(cors({
   origin: config.nodeEnv === 'production' 
     ? ['https://yourdomain.com']
-    : ['http://localhost:5173', 'http://localhost:3001', 'http://127.0.0.1:5173'],
+    : ['http://localhost:5173', 'https://git-hub-shoppers.vercel.app', 'http://127.0.0.1:5173'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
