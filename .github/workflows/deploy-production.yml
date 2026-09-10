@@ -58,7 +58,10 @@ jobs:
           ssh -p "$EC2_SSH_PORT" -i ~/.ssh/ec2_deploy_key "$EC2_USER@$EC2_HOST" \
             "set -e; \
              if [ ! -d '$APP_DIR/.git' ]; then \
-               git clone https://github.com/Rodrigoclc/GitHub-Shoppers.git '$APP_DIR'; \
+               tmp_dir=\$(mktemp -d); \
+               git clone https://github.com/Rodrigoclc/GitHub-Shoppers.git "\$tmp_dir"; \
+               cp -a "\$tmp_dir"/. '$APP_DIR'/; \
+               rm -rf "\$tmp_dir"; \
              else \
                git -C '$APP_DIR' fetch origin main; \
                git -C '$APP_DIR' reset --hard origin/main; \
