@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'backend/**'
+      - 'frontend/**'
       - 'scripts/**'
       - '.github/workflows/deploy-production.yml'
   workflow_dispatch:
@@ -21,6 +22,10 @@ jobs:
       APP_DIR: /home/ubuntu/github-shoppers
       ENV_FILE: /home/ubuntu/github-shoppers/.env
       APP_PORT: '8082'
+      FRONTEND_PORT: '8083'
+      API_URL: https://api.github-shoppers.orodrigodev.com.br
+      FRONTEND_CONTAINER: github-shoppers-web
+      FRONTEND_IMAGE: github-shoppers-web:prod
       CONTAINER_NAME: github-shoppers-api
       IMAGE_NAME: github-shoppers-api:prod
 
@@ -67,7 +72,8 @@ jobs:
                git -C '$APP_DIR' reset --hard origin/main; \
              fi; \
              chmod +x '$APP_DIR/scripts/deploy_ec2_docker.sh'; \
-             APP_DIR='$APP_DIR' ENV_FILE='$ENV_FILE' APP_PORT='$APP_PORT' CONTAINER_NAME='$CONTAINER_NAME' IMAGE_NAME='$IMAGE_NAME' '$APP_DIR/scripts/deploy_ec2_docker.sh'"
+             grep -q '^FRONTEND_URL=' '$ENV_FILE' || printf '%s\n' 'FRONTEND_URL=https://app.github-shoppers.orodrigodev.com.br' >> '$ENV_FILE'; \
+             APP_DIR='$APP_DIR' ENV_FILE='$ENV_FILE' APP_PORT='$APP_PORT' FRONTEND_PORT='$FRONTEND_PORT' API_URL='$API_URL' CONTAINER_NAME='$CONTAINER_NAME' IMAGE_NAME='$IMAGE_NAME' FRONTEND_CONTAINER='$FRONTEND_CONTAINER' FRONTEND_IMAGE='$FRONTEND_IMAGE' '$APP_DIR/scripts/deploy_ec2_docker.sh'"
 
       - name: Remove SSH key
         if: always()

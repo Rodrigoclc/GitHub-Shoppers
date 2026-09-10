@@ -19,6 +19,7 @@ interface Config {
   github: {
     apiUrl: string;
   };
+  frontendUrl: string;
 }
 
 const config: Config = {
@@ -38,6 +39,7 @@ const config: Config = {
   github: {
     apiUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
   },
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
 };
 
 export default config;
