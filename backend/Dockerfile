@@ -1,25 +1,26 @@
-# Etapa de build
-FROM node:22 AS builder
+FROM node:22-bookworm-slim AS build
 
 WORKDIR /app
-
 COPY package*.json ./
+RUN npm ci
+
 COPY tsconfig.json ./
-COPY jest.config.js ./
-COPY ./src ./src
+COPY src ./src
+RUN npm run build \
+    && mkdir -p dist/database \
+    && cp -R src/database/migrations dist/database/migrations \
+    && npm prune --omit=dev
 
-RUN npm install
-RUN npm run build
+FROM node:22-bookworm-slim AS runtime
 
-# Etapa de produção
-FROM node:22
-
+ENV NODE_ENV=production
+ENV PORT=8082
 WORKDIR /app
 
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/dist ./dist
-RUN npm install --omit=dev
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
 
-EXPOSE 3000
-
-CMD ["npm", "run", "start"]
+USER node
+EXPOSE 8082
+CMD ["node", "dist/server.js"]
