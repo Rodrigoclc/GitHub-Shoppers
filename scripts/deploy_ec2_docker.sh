@@ -9,7 +9,7 @@ CONTAINER_NAME="${CONTAINER_NAME:-github-shoppers-api}"
 IMAGE_NAME="${IMAGE_NAME:-github-shoppers-api:prod}"
 FRONTEND_CONTAINER="${FRONTEND_CONTAINER:-github-shoppers-web}"
 FRONTEND_IMAGE="${FRONTEND_IMAGE:-github-shoppers-web:prod}"
-API_URL="${API_URL:-https://api.github-shoppers.orodrigodev.com.br}"
+API_URL="${API_URL:-https://api-github-shoppers.orodrigodev.com.br}"
 
 cd "$APP_DIR/backend"
 test -f "$ENV_FILE"
