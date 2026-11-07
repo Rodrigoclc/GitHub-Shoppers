@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "application": "github-shoppers",
+  "ownership": {
+    "application_repository": [
+      "tests_and_quality_gates",
+      "dockerfiles_and_runtime_images",
+      "immutable_ghcr_images"
+    ],
+    "central_infrastructure_repository": [
+      "compose_and_host_runtime_topology",
+      "reverse_proxy_and_dns",
+      "postgresql_service_and_persistent_storage",
+      "runtime_configuration_and_secrets",
+      "pull_migrate_start_and_health_verification"
+    ]
+  },
+  "images": {
+    "api": {
+      "repository": "ghcr.io/rodrigoclc/github-shoppers-api",
+      "tag_format": "sha-<full-git-commit>",
+      "platform": "linux/amd64",
+      "dockerfile": "backend/Dockerfile"
+    },
+    "web": {
+      "repository": "ghcr.io/rodrigoclc/github-shoppers-web",
+      "tag_format": "sha-<full-git-commit>",
+      "platform": "linux/amd64",
+      "dockerfile": "frontend/Dockerfile",
+      "build_args": {
+        "VITE_API_URL": "https://api-github-shoppers.orodrigodev.com.br/api"
+      }
+    }
+  },
+  "runtime": {
+    "api": {
+      "container_port": 8082,
+      "health": {
+        "path": "/api/health",
+        "method": "GET",
+        "expected_status": 200
+      },
+      "migration": {
+        "mode": "one-shot",
+        "image": "api",
+        "command": ["node", "dist/database/migrate.js"]
+      },
+      "runtime_config_names": [
+        "DB_HOST",
+        "DB_PORT",
+        "DB_NAME",
+        "DB_USERNAME",
+        "DB_PASSWORD",
+        "JWT_SECRET",
+        "PORT",
+        "NODE_ENV",
+        "GITHUB_API_URL",
+        "FRONTEND_URL"
+      ]
+    },
+    "web": {
+      "container_port": 8083,
+      "health": {
+        "path": "/",
+        "method": "GET",
+        "expected_status": 200
+      },
+      "runtime_config_names": []
+    }
+  },
+  "database": {
+    "engine": "postgresql",
+    "database": "github_shoppers",
+    "role": "github_shoppers_app",
+    "provisioning": "central-infrastructure"
+  }
+}
